@@ -62,6 +62,25 @@ type Provider interface {
 	Model() models.Model
 }
 
+var openAICompatibleProviders = map[models.ModelProvider]bool{
+	models.ProviderOpenAI:     true,
+	models.ProviderOpenRouter: true,
+	models.ProviderGroq:      true,
+	models.ProviderNvidiaNIM: true,
+	models.ProviderKimi:      true,
+	models.ProviderGLM:       true,
+	models.ProviderDeepSeek:  true,
+	models.ProviderMistral:   true,
+	models.ProviderTogether:  true,
+	models.ProviderFireworks: true,
+	models.ProviderPerplexity: true,
+	models.ProviderAnyscale:  true,
+	models.ProviderXAI:       true,
+	models.ProviderCohere:    true,
+	models.ProviderVoyage:    true,
+	models.ProviderAI21:      true,
+}
+
 func NewProvider(model models.Model, apiKey string, baseURL string) (Provider, error) {
 	switch model.Provider {
 	case models.ProviderAnthropic:
@@ -71,6 +90,12 @@ func NewProvider(model models.Model, apiKey string, baseURL string) (Provider, e
 	case models.ProviderGemini:
 		return NewGeminiProvider(model, apiKey), nil
 	default:
+		if openAICompatibleProviders[model.Provider] {
+			if baseURL == "" {
+				baseURL = model.Provider.DefaultBaseURL()
+			}
+			return NewOpenAIProvider(model, apiKey, baseURL), nil
+		}
 		return nil, errors.New("unsupported provider: " + string(model.Provider))
 	}
 }
