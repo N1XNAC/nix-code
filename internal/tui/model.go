@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"strings"
@@ -42,7 +43,7 @@ type Model struct {
 	spinner    spinner.Model
 	messages   []messageItem
 	streaming  bool
-	streamBuf  strings.Builder
+	streamBuf  bytes.Buffer
 	err        error
 	eventCh    chan provider.ProviderEvent
 }
