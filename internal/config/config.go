@@ -140,14 +140,18 @@ func (c *Config) SetProvider(name string, p Provider) {
 
 func (c *Config) GetActiveProvider() (string, Provider, bool) {
 	if c.DefaultProvider != "" {
-		if p, ok := c.Providers[c.DefaultProvider]; ok && p.APIKey != "" {
-			return c.DefaultProvider, p, true
+		if p, ok := c.Providers[c.DefaultProvider]; ok {
+			if p.APIKey != "" || c.DefaultProvider == "ollama" {
+				return c.DefaultProvider, p, true
+			}
 		}
 	}
-	preferred := []string{"anthropic", "openai", "gemini", "openrouter", "groq", "deepseek", "mistral"}
+	preferred := []string{"anthropic", "openai", "gemini", "openrouter", "groq", "deepseek", "mistral", "ollama"}
 	for _, name := range preferred {
-		if p, ok := c.Providers[name]; ok && p.APIKey != "" {
-			return name, p, true
+		if p, ok := c.Providers[name]; ok {
+			if p.APIKey != "" || name == "ollama" {
+				return name, p, true
+			}
 		}
 	}
 	for name, p := range c.Providers {

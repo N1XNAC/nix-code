@@ -158,7 +158,9 @@ func (p *OpenAIProvider) SendMessages(ctx context.Context, messages []Message, t
 		return nil, err
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("Authorization", "Bearer "+p.apiKey)
+	if p.apiKey != "" {
+		httpReq.Header.Set("Authorization", "Bearer "+p.apiKey)
+	}
 
 	resp, err := http.DefaultClient.Do(httpReq)
 	if err != nil {
@@ -223,7 +225,9 @@ func (p *OpenAIProvider) StreamResponse(ctx context.Context, messages []Message,
 			return
 		}
 		httpReq.Header.Set("Content-Type", "application/json")
-		httpReq.Header.Set("Authorization", "Bearer "+p.apiKey)
+		if p.apiKey != "" {
+			httpReq.Header.Set("Authorization", "Bearer "+p.apiKey)
+		}
 
 		resp, err := http.DefaultClient.Do(httpReq)
 		if err != nil {

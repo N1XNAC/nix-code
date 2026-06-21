@@ -119,7 +119,7 @@ func (s *Server) handleSaveConfig(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleGetProviders(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode([]string{"anthropic", "openai", "gemini", "openrouter", "groq", "nvidia-nim", "kimi", "glm", "deepseek", "mistral", "together", "fireworks", "perplexity", "xai", "azure", "bedrock"})
+	json.NewEncoder(w).Encode([]string{"anthropic", "openai", "gemini", "openrouter", "groq", "nvidia-nim", "kimi", "glm", "deepseek", "mistral", "together", "fireworks", "perplexity", "xai", "ollama", "azure", "bedrock"})
 }
 
 func (s *Server) handleGetModels(w http.ResponseWriter, r *http.Request) {

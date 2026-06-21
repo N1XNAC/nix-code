@@ -36,7 +36,7 @@ type Agent struct {
 func New(cfg *config.Config, bus *pubsub.Bus, perms *permission.PermissionService) (*Agent, error) {
 	providerName, providerCfg, ok := cfg.GetActiveProvider()
 	if !ok {
-		return nil, fmt.Errorf("no API key configured. Run 'n1x config' to set up your API keys")
+		return nil, fmt.Errorf("no provider configured. Run 'n1x config' to set up API keys, or add Ollama (local)")
 	}
 
 	model, ok := models.FindModel(providerCfg.Model)

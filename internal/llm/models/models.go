@@ -23,6 +23,7 @@ const (
 	ProviderCohere      ModelProvider = "cohere"
 	ProviderVoyage      ModelProvider = "voyage"
 	ProviderAI21        ModelProvider = "ai21"
+	ProviderOllama      ModelProvider = "ollama"
 )
 
 func (p ModelProvider) DefaultBaseURL() string {
@@ -59,6 +60,8 @@ func (p ModelProvider) DefaultBaseURL() string {
 		return "https://api.voyageai.com/v1"
 	case ProviderAI21:
 		return "https://api.ai21.com/studio/v1"
+	case ProviderOllama:
+		return "http://localhost:11434/v1"
 	default:
 		return ""
 	}
@@ -105,6 +108,19 @@ var SupportedModels = []Model{
 	{ID: "sonar", Provider: ProviderPerplexity, DisplayName: "Sonar", ContextWindow: 200000, DefaultMaxTokens: 4096, CostPer1MIn: 1.00, CostPer1MOut: 1.00},
 	{ID: "grok-2", Provider: ProviderXAI, DisplayName: "Grok 2", ContextWindow: 131072, DefaultMaxTokens: 4096, CostPer1MIn: 2.00, CostPer1MOut: 10.00},
 	{ID: "grok-2-vision", Provider: ProviderXAI, DisplayName: "Grok 2 Vision", ContextWindow: 32768, DefaultMaxTokens: 4096, CostPer1MIn: 2.00, CostPer1MOut: 10.00, SupportsImages: true},
+
+	{ID: "llama3.2", Provider: ProviderOllama, DisplayName: "Llama 3.2", ContextWindow: 128000, DefaultMaxTokens: 4096},
+	{ID: "llama3.2:1b", Provider: ProviderOllama, DisplayName: "Llama 3.2 1B", ContextWindow: 128000, DefaultMaxTokens: 4096},
+	{ID: "llama3.2:3b", Provider: ProviderOllama, DisplayName: "Llama 3.2 3B", ContextWindow: 128000, DefaultMaxTokens: 4096},
+	{ID: "qwen2.5-coder:7b", Provider: ProviderOllama, DisplayName: "Qwen 2.5 Coder 7B", ContextWindow: 32768, DefaultMaxTokens: 4096},
+	{ID: "qwen2.5-coder:14b", Provider: ProviderOllama, DisplayName: "Qwen 2.5 Coder 14B", ContextWindow: 32768, DefaultMaxTokens: 4096},
+	{ID: "qwen2.5-coder:32b", Provider: ProviderOllama, DisplayName: "Qwen 2.5 Coder 32B", ContextWindow: 32768, DefaultMaxTokens: 4096},
+	{ID: "deepseek-r1:7b", Provider: ProviderOllama, DisplayName: "DeepSeek R1 7B", ContextWindow: 128000, DefaultMaxTokens: 4096, CanReason: true},
+	{ID: "deepseek-r1:14b", Provider: ProviderOllama, DisplayName: "DeepSeek R1 14B", ContextWindow: 128000, DefaultMaxTokens: 4096, CanReason: true},
+	{ID: "codellama", Provider: ProviderOllama, DisplayName: "Code Llama", ContextWindow: 16384, DefaultMaxTokens: 4096},
+	{ID: "mixtral:8x7b", Provider: ProviderOllama, DisplayName: "Mixtral 8x7B", ContextWindow: 32768, DefaultMaxTokens: 4096},
+	{ID: "mistral", Provider: ProviderOllama, DisplayName: "Mistral", ContextWindow: 8192, DefaultMaxTokens: 4096},
+	{ID: "phi3:14b", Provider: ProviderOllama, DisplayName: "Phi-3 14B", ContextWindow: 128000, DefaultMaxTokens: 4096},
 }
 
 func ModelRegistry() []Model {

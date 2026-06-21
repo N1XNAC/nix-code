@@ -79,6 +79,7 @@ var openAICompatibleProviders = map[models.ModelProvider]bool{
 	models.ProviderCohere:    true,
 	models.ProviderVoyage:    true,
 	models.ProviderAI21:      true,
+	models.ProviderOllama:    true,
 }
 
 func NewProvider(model models.Model, apiKey string, baseURL string) (Provider, error) {
