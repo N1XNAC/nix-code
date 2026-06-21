@@ -36,7 +36,6 @@ type Model struct {
 	mode       Mode
 	width      int
 	height     int
-	showBanner bool
 	textarea   textarea.Model
 	viewport   viewport.Model
 	spinner    spinner.Model
@@ -67,12 +66,13 @@ func InitialModel(ctx context.Context, ag *agent.Agent) Model {
 		cancel:     cancel,
 		agent:      ag,
 		session:    fmt.Sprintf("session-%d", time.Now().UnixNano()),
-		mode:       ModeCode,
-		showBanner: true,
-		textarea:   ta,
+		mode:     ModeCode,
+		textarea: ta,
 		viewport:   vp,
 		spinner:    s,
-		messages:   []messageItem{},
+		messages: []messageItem{
+			{role: "system", content: Banner + "\n\nN1X Code is ready. Ask me about your code or tell me what to build."},
+		},
 	}
 }
 
@@ -94,6 +94,8 @@ func (m *Model) renderMessages() {
 	var b strings.Builder
 	for _, msg := range m.messages {
 		switch msg.role {
+		case "system":
+			b.WriteString(msg.content + "\n\n")
 		case "user":
 			b.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#00BFFF")).Bold(true).Render("You:") + "\n")
 			b.WriteString(msg.content + "\n\n")
