@@ -63,7 +63,7 @@ else
   exit 1
 fi
 
-tar -xzf "$TMP_DIR/nix.tar.gz" -C "$TMP_DIR"
+tar -xzf "$TMP_DIR/nix.tar.gz" -C "$TMP_DIR" --strip-components=1
 mv "$TMP_DIR/$BINARY" "$INSTALL_DIR/$BINARY"
 chmod +x "$INSTALL_DIR/$BINARY"
 

@@ -14,7 +14,7 @@ Write-Host "Downloading from: $Url"
 $TmpFile = [System.IO.Path]::GetTempFileName()
 Invoke-WebRequest -Uri $Url -OutFile $TmpFile
 
-tar -xzf $TmpFile -C $InstallDir
+tar -xzf $TmpFile -C $InstallDir --strip-components=1
 Remove-Item $TmpFile
 
 $UserPath = [Environment]::GetEnvironmentVariable("Path", "User")
