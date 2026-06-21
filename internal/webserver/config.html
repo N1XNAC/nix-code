@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N1X Code Configuration</title>
+<style>
+  :root { --bg: #1a1a2e; --surface: #16213e; --accent: #0f3460; --text: #e0e0e0; --green: #4ecca3; --red: #e23e57; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 40px 20px; }
+  .container { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 2rem; margin-bottom: 8px; }
+  .subtitle { color: #888; margin-bottom: 32px; }
+  .section { background: var(--surface); border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #2a2a4a; }
+  .section h2 { font-size: 1.1rem; color: var(--green); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+  .field { margin-bottom: 16px; }
+  label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px; }
+  input, select { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid #333; border-radius: 6px; color: var(--text); font-size: 0.95rem; }
+  input:focus, select:focus { outline: none; border-color: var(--green); }
+  .btn { padding: 10px 24px; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--green); color: #000; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-secondary { background: var(--accent); color: var(--text); margin-right: 8px; }
+  .btn-secondary:hover { opacity: 0.9; }
+  .row { display: flex; gap: 12px; align-items: center; }
+  .flex { display: flex; justify-content: space-between; align-items: center; }
+  .perm-row { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2a4a; }
+  .perm-row select { width: auto; }
+  .perm-row span { flex: 1; }
+  .status { padding: 8px 12px; border-radius: 6px; margin-top: 8px; display: none; }
+  .status.success { display: block; background: rgba(78, 204, 163, 0.1); color: var(--green); }
+  .status.error { display: block; background: rgba(226, 62, 87, 0.1); color: var(--red); }
+  .badge { display: inline-block; background: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px; }
+  .add-btn { background: none; border: 1px dashed #555; color: #aaa; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin-top: 8px; }
+  .add-btn:hover { border-color: var(--green); color: var(--green); }
+  .delete-btn { background: none; border: none; color: var(--red); cursor: pointer; font-size: 1.2rem; padding: 0 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="flex">
+    <div>
+      <h1>N1X Code</h1>
+      <div class="subtitle">Terminal AI Coding Agent &mdash; Configuration</div>
+    </div>
+    <button class="btn btn-primary" onclick="saveConfig()">Save &amp; Close</button>
+  </div>
+
+  <div id="status" class="status"></div>
+
+  <div class="section" id="providers-section">
+    <h2>AI Providers</h2>
+    <div id="providers"></div>
+    <button class="add-btn" onclick="addProvider()">+ Add Provider</button>
+  </div>
+
+  <div class="section">
+    <h2>Default Settings</h2>
+    <div class="field">
+      <label>Build Agent Model</label>
+      <select id="buildModel"></select>
+    </div>
+    <div class="field">
+      <label>Plan Agent Model</label>
+      <select id="planModel"></select>
+    </div>
+    <div class="field">
+      <label>Theme</label>
+      <select id="theme">
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+      </select>
+    </div>
+    <div class="field">
+      <label><input type="checkbox" id="autoCompact" checked> Auto-compact context</label>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Permissions</h2>
+    <div id="permissions"></div>
+  </div>
+</div>
+
+<script>
+const providersData = [
+  { id: 'anthropic', name: 'Anthropic Claude', models: ['claude-sonnet-4-20250514', 'claude-3.5-haiku-20241022'] },
+  { id: 'openai', name: 'OpenAI', models: ['gpt-4o', 'gpt-4o-mini'] },
+  { id: 'gemini', name: 'Google Gemini', models: ['gemini-2.5-pro-exp-03-25', 'gemini-2.0-flash'] },
+  { id: 'openrouter', name: 'OpenRouter', models: ['openai/gpt-4o', 'anthropic/claude-sonnet-4'] },
+  { id: 'groq', name: 'Groq', models: ['llama-3.3-70b-versatile', 'mixtral-8x7b-32768'] },
+  { id: 'azure', name: 'Azure OpenAI', models: ['gpt-4o'] },
+  { id: 'bedrock', name: 'AWS Bedrock', models: ['claude-sonnet-4-20250514'] },
+];
+
+let config = { providers: {}, permissions: { bash: 'ask', write: 'allow', edit: 'allow' } };
+
+async function loadConfig() {
+  try {
+    const res = await fetch('/api/config');
+    config = await res.json();
+    render();
+  } catch(e) { console.log('Using defaults'); }
+}
+
+function render() {
+  renderProviders();
+  renderPermissions();
+  renderModels();
+  document.getElementById('theme').value = config.theme || 'dark';
+  document.getElementById('autoCompact').checked = config.autoCompact !== false;
+}
+
+function renderProviders() {
+  const container = document.getElementById('providers');
+  container.innerHTML = '';
+  let count = 0;
+  for (const [id, p] of Object.entries(config.providers || {})) {
+    count++;
+    const div = document.createElement('div');
+    div.className = 'field';
+    const provName = getProviderName(id);
+    const modelOpts = getModelOptions(id, p.model || '');
+    div.innerHTML = '<div class="flex">' +
+      '<label>' + provName + ' <span class="badge">' + id + '</span></label>' +
+      '<button class="delete-btn" onclick="removeProvider(\'' + id + '\')">x</button>' +
+      '</div>' +
+      '<input type="password" placeholder="API Key" value="' + (p.apiKey || '') + '" data-provider="' + id + '" class="api-key">' +
+      '<div class="row" style="margin-top:8px">' +
+      '<select data-provider="' + id + '" class="model-select" style="flex:1">' + modelOpts + '</select>' +
+      '<button class="btn btn-secondary" onclick="testConnection(\'' + id + '\')">Test</button>' +
+      '</div>';
+    container.appendChild(div);
+  }
+  if (count === 0) {
+    container.innerHTML = '<p style="color:#666;padding:8px 0">No providers configured yet. Click "+ Add Provider" to add one.</p>';
+  }
+}
+
+function renderPermissions() {
+  const container = document.getElementById('permissions');
+  container.innerHTML = '';
+  const perms = config.permissions || {};
+  const tools = ['bash', 'write', 'edit', 'read', 'grep', 'glob', 'webfetch', 'todowrite'];
+  tools.forEach(function(t) {
+    const div = document.createElement('div');
+    div.className = 'perm-row';
+    const val = perms[t] || 'allow';
+    div.innerHTML = '<span>' + t + '</span>' +
+      '<select data-perm="' + t + '">' +
+      '<option value="allow"' + (val === 'allow' ? ' selected' : '') + '>Allow</option>' +
+      '<option value="ask"' + (val === 'ask' ? ' selected' : '') + '>Ask</option>' +
+      '<option value="deny"' + (val === 'deny' ? ' selected' : '') + '>Deny</option>' +
+      '</select>';
+    container.appendChild(div);
+  });
+}
+
+function renderModels() {
+  const buildSel = document.getElementById('buildModel');
+  const planSel = document.getElementById('planModel');
+  const allModels = getFlatModels();
+  buildSel.innerHTML = allModels.map(function(m) {
+    return '<option value="' + m + '"' + (config.buildModel === m ? ' selected' : '') + '>' + m + '</option>';
+  }).join('');
+  planSel.innerHTML = allModels.map(function(m) {
+    return '<option value="' + m + '"' + (config.planModel === m ? ' selected' : '') + '>' + m + '</option>';
+  }).join('');
+}
+
+function getFlatModels() {
+  const result = [];
+  providersData.forEach(function(p) {
+    p.models.forEach(function(m) {
+      result.push(p.id + '/' + m);
+    });
+  });
+  return result;
+}
+
+function getProviderName(id) {
+  const p = providersData.find(function(x) { return x.id === id; });
+  return p ? p.name : id;
+}
+
+function getModelOptions(providerId, selected) {
+  const p = providersData.find(function(x) { return x.id === providerId; });
+  if (!p) { return '<option>Default</option>'; }
+  return p.models.map(function(m) {
+    return '<option value="' + m + '"' + (m === selected ? ' selected' : '') + '>' + m + '</option>';
+  }).join('');
+}
+
+function addProvider() {
+  const id = prompt('Enter provider ID (anthropic, openai, gemini, openrouter, groq, azure, bedrock):');
+  if (!id || config.providers[id]) return;
+  config.providers[id] = { apiKey: '', model: '' };
+  renderProviders();
+}
+
+function removeProvider(id) {
+  delete config.providers[id];
+  renderProviders();
+}
+
+async function saveConfig() {
+  config.theme = document.getElementById('theme').value;
+  config.autoCompact = document.getElementById('autoCompact').checked;
+  config.buildModel = document.getElementById('buildModel').value;
+  config.planModel = document.getElementById('planModel').value;
+
+  config.permissions = {};
+  document.querySelectorAll('[data-perm]').forEach(function(el) {
+    config.permissions[el.getAttribute('data-perm')] = el.value;
+  });
+
+  document.querySelectorAll('.api-key').forEach(function(el) {
+    const provider = el.getAttribute('data-provider');
+    if (config.providers[provider]) config.providers[provider].apiKey = el.value;
+  });
+
+  document.querySelectorAll('.model-select').forEach(function(el) {
+    const provider = el.getAttribute('data-provider');
+    if (config.providers[provider]) config.providers[provider].model = el.value;
+  });
+
+  try {
+    const res = await fetch('/api/config/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config)
+    });
+    const data = await res.json();
+    showStatus(data.status === 'ok' ? 'Configuration saved!' : 'Error saving', data.status === 'ok');
+  } catch(e) {
+    showStatus('Error: ' + e.message, false);
+  }
+}
+
+async function testConnection(providerId) {
+  const el = document.querySelector('.api-key[data-provider="' + providerId + '"]');
+  const key = el ? el.value : '';
+  if (!key) { showStatus('Enter an API key first', false); return; }
+  try {
+    const res = await fetch('/api/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider: providerId, apiKey: key })
+    });
+    const data = await res.json();
+    showStatus(data.success ? 'Key saved. Run "nix run hello" to test.' : data.error, data.success);
+  } catch(e) {
+    showStatus('Error: ' + e.message, false);
+  }
+}
+
+function showStatus(msg, success) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status ' + (success ? 'success' : 'error');
+  el.style.display = 'block';
+  setTimeout(function() { el.style.display = 'none'; }, 5000);
+}
+
+loadConfig();
+</script>
+</body>
+</html>

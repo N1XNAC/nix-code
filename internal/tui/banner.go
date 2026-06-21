@@ -1,0 +1,30 @@
+package tui
+
+import "fmt"
+
+const Version = "0.1.0"
+
+var Banner = fmt.Sprintf(`
+%s
+
+       Term1na1 A1 Cod1ng Agent v%s
+`, N1XBanner+CodeBanner, Version)
+
+const N1XBanner = `
+███╗  ██╗  ██╗ ██╗  ██╗
+████╗ ██║  ══╝ ╚██╗██╔╝
+██╔██╗██║  ██╗  ╚███╔╝ 
+██║╚████║  ██║  ██╔██╗ 
+██║ ╚███║  ██║ ██╔╝ ██╗
+╚═╝  ╚══╝  ╚═╝ ╚═╝  ╚═╝`
+
+const CodeBanner = `
+ ██████╗ ██████╗ ██████╗ ███████╗
+██╔════╝██╔═══██╗██╔══██╗██╔════╝
+██║     ██║   ██║██║  ██║█████╗
+██║     ██║   ██║██║  ██║██╔══╝
+╚██████╗╚██████╔╝██████╔╝███████╗
+ ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝`
+
+const ThinkModePrompt = "Think Mode - Analysis only (read-only)"
+const CodeModePrompt = "Code Mode - Full access (read/write/bash)"

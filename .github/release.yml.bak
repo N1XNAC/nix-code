@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [linux, darwin, windows]
+        arch: [amd64, arm64]
+        exclude:
+          - os: windows
+            arch: arm64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: |
+          mkdir -p dist
+          go build -o "dist/nix_${GOOS}_${GOARCH}/nix" ./cmd/nix/
+          if [ "${{ matrix.os }}" = "windows" ]; then
+            mv "dist/nix_${GOOS}_${GOARCH}/nix" "dist/nix_${GOOS}_${GOARCH}/nix.exe"
+          fi
+          cd dist
+          tar czf "nix_${GOOS}_${GOARCH}.tar.gz" "nix_${GOOS}_${GOARCH}/"
+          cd ..
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nix_${{ matrix.os }}_${{ matrix.arch }}
+          path: dist/nix_${{ matrix.os }}_${{ matrix.arch }}/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*.tar.gz
+          generate_release_notes: true

@@ -1,0 +1,6 @@
+/nix
+/n1x
+/n1x.exe
+/dist/
+*.tar.gz
+.DS_Store
