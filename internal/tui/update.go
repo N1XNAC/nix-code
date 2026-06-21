@@ -42,14 +42,15 @@ func submitPrompt(m *Model) tea.Cmd {
 	m.streaming = true
 	m.streamBuf.Reset()
 
-	m.eventCh = make(chan provider.ProviderEvent, 100)
+	ch := make(chan provider.ProviderEvent, 100)
+	m.eventCh = ch
 
 	go func() {
-		m.agent.StreamRun(m.ctx, prompt, m.session, m.eventCh)
-		close(m.eventCh)
+		m.agent.StreamRun(m.ctx, prompt, m.session, ch)
+		close(ch)
 	}()
 
-	return readNextEvent(m.eventCh)
+	return readNextEvent(ch)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
