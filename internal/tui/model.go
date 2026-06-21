@@ -54,7 +54,7 @@ func InitialModel(ctx context.Context, ag *agent.Agent) Model {
 	ta.Focus()
 	ta.CharLimit = 0
 	ta.SetWidth(80)
-	ta.SetHeight(3)
+	ta.SetHeight(1)
 
 	s := spinner.New()
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("#4ecca3"))
@@ -68,12 +68,12 @@ func InitialModel(ctx context.Context, ag *agent.Agent) Model {
 		cancel:     cancel,
 		agent:      ag,
 		session:    fmt.Sprintf("session-%d", time.Now().UnixNano()),
-		mode:     ModeCode,
-		textarea: ta,
+		mode:       ModeCode,
+		textarea:   ta,
 		viewport:   vp,
 		spinner:    s,
 		messages: []messageItem{
-			{role: "system", content: Banner + "\n\nN1X Code is ready. Ask me about your code or tell me what to build."},
+			{role: "system", content: Banner + "\n\nN1X Code is ready. Ask me anything about your code or tell me what to build."},
 		},
 	}
 }

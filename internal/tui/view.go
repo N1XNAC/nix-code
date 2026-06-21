@@ -50,6 +50,18 @@ func (m Model) renderHeader() string {
 			Padding(0, 1)
 	}
 
+	if m.width < 50 {
+		title := lipgloss.NewStyle().Foreground(lipgloss.Color("#4ecca3")).Bold(true).Render("n1x")
+		modelInfo := lipgloss.NewStyle().Foreground(lipgloss.Color("#555555")).Render(string(m.agent.Provider().Model().Provider))
+		return lipgloss.JoinHorizontal(lipgloss.Center,
+			title,
+			" ",
+			modeStyle.Render(modeText),
+			" ",
+			modelInfo,
+		)
+	}
+
 	title := lipgloss.NewStyle().Foreground(lipgloss.Color("#4ecca3")).Bold(true).Render(" N1X Code ")
 	providerName := lipgloss.NewStyle().Foreground(lipgloss.Color("#555555")).Render(string(m.agent.Provider().Model().Provider))
 	modelName := lipgloss.NewStyle().Foreground(lipgloss.Color("#888888")).Render(m.agent.Provider().Model().ID)
@@ -115,7 +127,7 @@ func (m Model) renderStatusBar() string {
 	if m.streaming {
 		statusText = lipgloss.NewStyle().Foreground(lipgloss.Color("#4ecca3")).Render(m.spinner.View() + " Working...")
 	} else {
-		statusText = lipgloss.NewStyle().Foreground(lipgloss.Color("#888888")).Render("Tab to toggle modes | Enter to send | Ctrl+C to quit")
+		statusText = lipgloss.NewStyle().Foreground(lipgloss.Color("#888888")).Render("Enter to send | Esc to navigate")
 	}
 
 	infoText := lipgloss.NewStyle().

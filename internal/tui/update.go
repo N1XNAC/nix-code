@@ -62,21 +62,35 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 
 		headerHeight := 2
-		inputHeight := 5
 		statusHeight := 1
-		vpHeight := m.height - headerHeight - inputHeight - statusHeight - 2
+		padding := 2
 
-		m.viewport.Width = m.width - 4
+		inputBorderSize := 2
+		inputHeight := 5
+		if m.height < 20 {
+			inputHeight = 3
+		} else if m.height < 30 {
+			inputHeight = 4
+		}
+
+		taHeight := inputHeight - inputBorderSize
+		if taHeight < 1 {
+			taHeight = 1
+		}
+
+		vpHeight := m.height - headerHeight - inputHeight - statusHeight - padding
+		if vpHeight < 1 {
+			vpHeight = 1
+		}
+
+		m.viewport.Width = max(1, m.width-4)
 		m.viewport.Height = vpHeight
-		m.textarea.SetWidth(m.width - 6)
+		m.textarea.SetWidth(max(1, m.width-6))
+		m.textarea.SetHeight(taHeight)
 		m.renderMessages()
 		m.ready = true
 
 	case tea.KeyMsg:
-		if !m.textarea.Focused() {
-			m.viewport, _ = m.viewport.Update(msg)
-		}
-
 		switch msg.String() {
 		case "tab":
 			m.ToggleMode()
@@ -96,13 +110,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.textarea.Blur()
 			} else {
 				m.textarea.Focus()
-			}
-
-		case "up", "down":
-			if !m.textarea.Focused() {
-				m.viewport, _ = m.viewport.Update(msg)
-			} else {
-				m.textarea, _ = m.textarea.Update(msg)
 			}
 		}
 
@@ -170,7 +177,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.textarea, cmd = m.textarea.Update(msg)
 	cmds = append(cmds, cmd)
 
-	if !m.textarea.Focused() {
+	_, isKey := msg.(tea.KeyMsg)
+	if !isKey || !m.textarea.Focused() {
 		var vpCmd tea.Cmd
 		m.viewport, vpCmd = m.viewport.Update(msg)
 		cmds = append(cmds, vpCmd)
