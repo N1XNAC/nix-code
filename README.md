@@ -22,12 +22,12 @@
 ## Quick Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/n1xcode/n1x/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/N1XNAC/nix-code/main/install.sh | bash
 ```
 
 Windows (PowerShell):
 ```powershell
-powershell -c "irm https://raw.githubusercontent.com/n1xcode/n1x/main/install.ps1 | iex"
+powershell -c "irm https://raw.githubusercontent.com/N1XNAC/nix-code/main/install.ps1 | iex"
 ```
 
 ## Commands
@@ -59,7 +59,7 @@ Opens `http://localhost:8080` in your browser. Add your API keys, set default mo
 ## Building from Source
 
 ```bash
-git clone https://github.com/n1xcode/n1x.git
+git clone https://github.com/N1XNAC/nix-code.git
 cd n1x
 go build -o n1x ./cmd/n1x/
 ```

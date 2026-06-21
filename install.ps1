@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-$Repo = "n1xcode/n1x"
+$Repo = "N1XNAC/nix-code"
 $Binary = "n1x"
 
 Write-Host "Installing N1X Code - Terminal AI Coding Agent" -ForegroundColor Blue
@@ -24,5 +24,5 @@ if ($UserPath -notlike "*$InstallDir*") {
 }
 
 Write-Host "N1X Code installed!" -ForegroundColor Green
-Write-Host "Run 'nix config' to set up your API keys"
-Write-Host "Run 'nix run ""your prompt""' to start coding"
+Write-Host "Run 'n1x config' to set up your API keys"
+Write-Host "Run 'n1x run ""your prompt""' to start coding"

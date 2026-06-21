@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="n1xcode/n1x"
+REPO="N1XNAC/nix-code"
 BINARY="n1x"
 VERSION="${1:-latest}"
 
@@ -85,9 +85,9 @@ add_to_path
 echo -e "${GREEN}"
   echo "  ✓ N1X Code installed successfully!"
 echo -e "${NC}"
-echo "  Run 'nix config' to set up your API keys"
-echo "  Run 'nix run \"your prompt\"' to start coding"
-echo "  Run 'nix' to launch the interactive TUI"
+  echo "  Run 'n1x config' to set up your API keys"
+  echo "  Run 'n1x run \"your prompt\"' to start coding"
+  echo "  Run 'n1x' to launch the interactive TUI"
 echo ""
 echo "  Restart your terminal or run:"
-echo "    export PATH=\"\$PATH:$INSTALL_DIR\""
+  echo "    export PATH=\"\$PATH:$INSTALL_DIR\""
