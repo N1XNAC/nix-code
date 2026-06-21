@@ -7,6 +7,7 @@ import (
 	"github.com/n1xcode/n1x/internal/app"
 	"github.com/n1xcode/n1x/internal/config"
 	"github.com/n1xcode/n1x/internal/tui"
+	"github.com/n1xcode/n1x/internal/webserver"
 	"github.com/spf13/cobra"
 )
 
@@ -62,12 +63,8 @@ func main() {
 			if err != nil {
 				return fmt.Errorf("failed to load config: %w", err)
 			}
-			a, err := app.New(cfg)
-			if err != nil {
-				return fmt.Errorf("failed to create app: %w", err)
-			}
-			defer a.Shutdown()
-			return a.RunConfigServer(cmd.Context())
+			srv := webserver.New(cfg)
+			return srv.Start(cmd.Context())
 		},
 	})
 

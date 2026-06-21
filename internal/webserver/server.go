@@ -151,5 +151,5 @@ func (s *Server) handleTestConnection(w http.ResponseWriter, r *http.Request) {
 
 	os.Setenv("NIX_TEST_KEY", req.APIKey)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]any{"success": true, "message": "API key saved. Test your connection with 'nix run hello'"})
+	json.NewEncoder(w).Encode(map[string]any{"success": true, "message": "API key saved. Test your connection with 'n1x run hello'"})
 }
