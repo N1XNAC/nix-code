@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/n1xcode/n1x/internal/llm/provider"
 )
@@ -22,6 +21,16 @@ type errMsg struct {
 	err error
 }
 
+func readNextEvent(ch chan provider.ProviderEvent) tea.Cmd {
+	return func() tea.Msg {
+		event, ok := <-ch
+		if !ok {
+			return streamDoneMsg{}
+		}
+		return streamMsg{event: event}
+	}
+}
+
 func submitPrompt(m *Model) tea.Cmd {
 	prompt := strings.TrimSpace(m.textarea.Value())
 	if prompt == "" {
@@ -33,41 +42,14 @@ func submitPrompt(m *Model) tea.Cmd {
 	m.streaming = true
 	m.streamBuf.Reset()
 
-	eventCh := make(chan provider.ProviderEvent, 100)
+	m.eventCh = make(chan provider.ProviderEvent, 100)
 
 	go func() {
-		m.agent.StreamRun(m.ctx, prompt, m.session, eventCh)
-		close(eventCh)
+		m.agent.StreamRun(m.ctx, prompt, m.session, m.eventCh)
+		close(m.eventCh)
 	}()
 
-	return func() tea.Msg {
-		for event := range eventCh {
-			switch event.Type {
-			case provider.EventContentDelta:
-				return streamMsg{event: event}
-			case provider.EventToolUseStart:
-				return streamMsg{event: event}
-			case provider.EventToolUseDelta:
-				return streamMsg{event: event}
-			case provider.EventToolUseStop:
-				args := map[string]any{}
-				json.Unmarshal([]byte(event.Input), &args)
-				desc := fmt.Sprintf("🔧 Using tool: %s", event.Name)
-				if v, ok := args["file_path"]; ok {
-					desc += fmt.Sprintf(" (%s)", v)
-				}
-				if v, ok := args["command"]; ok {
-					desc += fmt.Sprintf(" (%s)", v)
-				}
-				m.AddToolMessage(desc)
-			case provider.EventComplete:
-				return streamDoneMsg{err: nil}
-			case provider.EventError:
-				return streamDoneMsg{err: event.Err}
-			}
-		}
-		return streamDoneMsg{err: nil}
-	}
+	return readNextEvent(m.eventCh)
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -105,7 +87,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "enter":
 			if !m.streaming && strings.TrimSpace(m.textarea.Value()) != "" {
-				return m, tea.Batch(submitPrompt(&m), m.spinner.Tick)
+				return m, tea.Batch(submitPrompt(&m))
 			}
 
 		case "esc":
@@ -132,14 +114,40 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			lastMsg := messageItem{role: "assistant", content: m.streamBuf.String()}
 			m.messages = append(m.messages, lastMsg)
 			m.renderMessages()
+			return m, readNextEvent(m.eventCh)
 
 		case provider.EventToolUseStart:
 			m.AddToolMessage(fmt.Sprintf("  Running tool: %s...", e.Name))
+			return m, readNextEvent(m.eventCh)
+
+		case provider.EventToolUseDelta:
+			return m, readNextEvent(m.eventCh)
+
+		case provider.EventToolUseStop:
+			args := map[string]any{}
+			json.Unmarshal([]byte(e.Input), &args)
+			desc := fmt.Sprintf("  Tool: %s", e.Name)
+			if v, ok := args["file_path"]; ok {
+				desc += fmt.Sprintf(" (%s)", v)
+			}
+			if v, ok := args["command"]; ok {
+				desc += fmt.Sprintf(" (%s)", v)
+			}
+			m.AddToolMessage(desc)
+			return m, readNextEvent(m.eventCh)
+
+		case provider.EventComplete:
+			return m, readNextEvent(m.eventCh)
+
+		case provider.EventError:
+			m.streamBuf.WriteString(fmt.Sprintf("Error: %s", e.Err))
+			m.AddMessage("tool", fmt.Sprintf("Error: %s", e.Err))
+			return m, readNextEvent(m.eventCh)
 		}
-		return m, m.spinner.Tick
 
 	case streamDoneMsg:
 		m.streaming = false
+		m.eventCh = nil
 		if m.streamBuf.Len() > 0 {
 			m.AddMessage("assistant", m.streamBuf.String())
 		}
@@ -153,14 +161,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case errMsg:
 		m.err = msg.err
 		m.streaming = false
-		return m, nil
-
-	case spinner.TickMsg:
-		if m.streaming {
-			var cmd tea.Cmd
-			m.spinner, cmd = m.spinner.Update(msg)
-			return m, cmd
-		}
+		m.eventCh = nil
 		return m, nil
 	}
 
@@ -176,4 +177,3 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	return m, tea.Batch(cmds...)
 }
-

@@ -12,6 +12,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/n1xcode/n1x/internal/llm/agent"
+	"github.com/n1xcode/n1x/internal/llm/provider"
 )
 
 type Mode int
@@ -43,6 +44,7 @@ type Model struct {
 	streaming  bool
 	streamBuf  strings.Builder
 	err        error
+	eventCh    chan provider.ProviderEvent
 }
 
 func InitialModel(ctx context.Context, ag *agent.Agent) Model {
