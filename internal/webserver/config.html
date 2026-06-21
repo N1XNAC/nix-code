@@ -152,10 +152,18 @@ let initialConfig = '';
 async function loadConfig() {
   try {
     const res = await fetch('/api/config');
+    if (!res.ok) {
+      showStatus('Failed to load config: server returned ' + res.status, false);
+      render();
+      return;
+    }
     config = await res.json();
-    initialConfig = JSON.stringify(config);
     render();
-  } catch(e) { render(); }
+  } catch(e) {
+    showStatus('Failed to connect to config server. Make sure n1x config is running.', false);
+    console.error('Config load error:', e);
+    render();
+  }
 }
 
 function render() {
@@ -318,6 +326,11 @@ async function saveConfig() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(config)
     });
+    if (!res.ok) {
+      const text = await res.text();
+      showStatus('Save failed (' + res.status + '): ' + text, false);
+      return;
+    }
     const data = await res.json();
     initialConfig = JSON.stringify(config);
     showStatus(data.status === 'ok' ? 'Configuration saved!' : 'Error saving', data.status === 'ok');
