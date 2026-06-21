@@ -8,11 +8,12 @@ import (
 )
 
 type Config struct {
-	WorkingDir  string                `json:"wd,omitempty"`
-	Providers   map[string]Provider   `json:"providers,omitempty"`
-	DefaultMode string                `json:"defaultMode,omitempty"`
-	Theme       string                `json:"theme,omitempty"`
-	AutoCompact bool                  `json:"autoCompact,omitempty"`
+	WorkingDir      string                `json:"wd,omitempty"`
+	Providers       map[string]Provider   `json:"providers,omitempty"`
+	DefaultProvider string                `json:"defaultProvider,omitempty"`
+	DefaultMode     string                `json:"defaultMode,omitempty"`
+	Theme           string                `json:"theme,omitempty"`
+	AutoCompact     bool                  `json:"autoCompact,omitempty"`
 	LSP         map[string]LSPConfig  `json:"lsp,omitempty"`
 	MCPServers  map[string]MCPServer  `json:"mcpServers,omitempty"`
 	Permissions map[string]string     `json:"permissions,omitempty"`
@@ -138,6 +139,17 @@ func (c *Config) SetProvider(name string, p Provider) {
 }
 
 func (c *Config) GetActiveProvider() (string, Provider, bool) {
+	if c.DefaultProvider != "" {
+		if p, ok := c.Providers[c.DefaultProvider]; ok && p.APIKey != "" {
+			return c.DefaultProvider, p, true
+		}
+	}
+	preferred := []string{"anthropic", "openai", "gemini", "openrouter", "groq", "deepseek", "mistral"}
+	for _, name := range preferred {
+		if p, ok := c.Providers[name]; ok && p.APIKey != "" {
+			return name, p, true
+		}
+	}
 	for name, p := range c.Providers {
 		if p.APIKey != "" {
 			return name, p, true

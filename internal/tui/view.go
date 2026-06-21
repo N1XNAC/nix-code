@@ -51,14 +51,17 @@ func (m Model) renderHeader() string {
 	}
 
 	title := lipgloss.NewStyle().Foreground(lipgloss.Color("#4ecca3")).Bold(true).Render(" N1X Code ")
-	divider := lipgloss.NewStyle().Foreground(lipgloss.Color("#333333")).Render(strings.Repeat("─", max(0, m.width-40)))
+	providerName := lipgloss.NewStyle().Foreground(lipgloss.Color("#555555")).Render(string(m.agent.Provider().Model().Provider))
 	modelName := lipgloss.NewStyle().Foreground(lipgloss.Color("#888888")).Render(m.agent.Provider().Model().ID)
+	divider := lipgloss.NewStyle().Foreground(lipgloss.Color("#333333")).Render(strings.Repeat("─", max(0, m.width-50)))
 
 	return lipgloss.JoinHorizontal(lipgloss.Center,
 		title,
 		modeStyle.Render(modeText),
 		" ",
 		divider,
+		" ",
+		providerName,
 		" ",
 		modelName,
 	)
