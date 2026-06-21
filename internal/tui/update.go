@@ -177,8 +177,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	m.textarea, cmd = m.textarea.Update(msg)
 	cmds = append(cmds, cmd)
 
-	_, isKey := msg.(tea.KeyMsg)
-	if !isKey || !m.textarea.Focused() {
+	if !m.textarea.Focused() {
 		var vpCmd tea.Cmd
 		m.viewport, vpCmd = m.viewport.Update(msg)
 		cmds = append(cmds, vpCmd)

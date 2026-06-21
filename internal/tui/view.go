@@ -127,7 +127,7 @@ func (m Model) renderStatusBar() string {
 	if m.streaming {
 		statusText = lipgloss.NewStyle().Foreground(lipgloss.Color("#4ecca3")).Render(m.spinner.View() + " Working...")
 	} else {
-		statusText = lipgloss.NewStyle().Foreground(lipgloss.Color("#888888")).Render("Enter to send | Esc to navigate")
+		statusText = lipgloss.NewStyle().Foreground(lipgloss.Color("#888888")).Render("Enter send | Esc to scroll | select to copy")
 	}
 
 	infoText := lipgloss.NewStyle().

@@ -51,7 +51,7 @@ func (a *App) Shutdown() {
 
 func (a *App) RunTUI(ctx context.Context) error {
 	model := tui.InitialModel(ctx, a.Agent)
-	p := tea.NewProgram(model, tea.WithAltScreen(), tea.WithMouseCellMotion())
+	p := tea.NewProgram(model, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		return fmt.Errorf("TUI error: %w", err)
 	}
