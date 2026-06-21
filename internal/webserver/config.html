@@ -5,35 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>N1X Code Configuration</title>
 <style>
-  :root { --bg: #1a1a2e; --surface: #16213e; --accent: #0f3460; --text: #e0e0e0; --green: #4ecca3; --red: #e23e57; }
+  :root { --bg: #1a1a2e; --surface: #16213e; --accent: #0f3460; --text: #e0e0e0; --muted: #888; --green: #4ecca3; --red: #e23e57; --orange: #f0a030; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); padding: 40px 20px; }
   .container { max-width: 720px; margin: 0 auto; }
-  h1 { font-size: 2rem; margin-bottom: 8px; }
-  .subtitle { color: #888; margin-bottom: 32px; }
+  h1 { font-size: 2rem; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); margin-bottom: 32px; font-size: 0.95rem; }
   .section { background: var(--surface); border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #2a2a4a; }
   .section h2 { font-size: 1.1rem; color: var(--green); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
   .field { margin-bottom: 16px; }
   label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px; }
   input, select { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid #333; border-radius: 6px; color: var(--text); font-size: 0.95rem; }
   input:focus, select:focus { outline: none; border-color: var(--green); }
-  .btn { padding: 10px 24px; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+  .btn { padding: 10px 24px; border: none; border-radius: 6px; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; font-weight: 600; }
   .btn-primary { background: var(--green); color: #000; }
   .btn-primary:hover { opacity: 0.9; }
   .btn-secondary { background: var(--accent); color: var(--text); margin-right: 8px; }
   .btn-secondary:hover { opacity: 0.9; }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { opacity: 0.9; }
   .row { display: flex; gap: 12px; align-items: center; }
   .flex { display: flex; justify-content: space-between; align-items: center; }
   .perm-row { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2a4a; }
   .perm-row select { width: auto; }
   .perm-row span { flex: 1; }
-  .status { padding: 8px 12px; border-radius: 6px; margin-top: 8px; display: none; }
-  .status.success { display: block; background: rgba(78, 204, 163, 0.1); color: var(--green); }
-  .status.error { display: block; background: rgba(226, 62, 87, 0.1); color: var(--red); }
+  .status { padding: 10px 14px; border-radius: 6px; margin-top: 8px; display: none; font-size: 0.9rem; }
+  .status.success { display: block; background: rgba(78, 204, 163, 0.1); color: var(--green); border: 1px solid rgba(78, 204, 163, 0.2); }
+  .status.error { display: block; background: rgba(226, 62, 87, 0.1); color: var(--red); border: 1px solid rgba(226, 62, 87, 0.2); }
   .badge { display: inline-block; background: var(--accent); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px; }
-  .add-btn { background: none; border: 1px dashed #555; color: #aaa; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin-top: 8px; }
-  .add-btn:hover { border-color: var(--green); color: var(--green); }
-  .delete-btn { background: none; border: none; color: var(--red); cursor: pointer; font-size: 1.2rem; padding: 0 4px; }
+  .provider-card { background: #1e1e3a; border-radius: 8px; padding: 16px; margin-bottom: 12px; border: 1px solid #2a2a4a; }
+  .provider-card.connected { border-color: var(--green); }
+  .provider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .provider-name { font-weight: 600; font-size: 1rem; }
+  .provider-name small { font-weight: 400; color: var(--muted); font-size: 0.8rem; }
+  .provider-status { font-size: 0.8rem; color: var(--muted); }
+  .provider-status .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+  .dot.active { background: var(--green); }
+  .dot.inactive { background: #555; }
+  .add-section { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
+  .add-section select { flex: 1; }
+  .add-section .btn { flex-shrink: 0; }
+  .help-link { color: var(--green); text-decoration: none; font-size: 0.85rem; }
+  .help-link:hover { text-decoration: underline; }
+  .key-hint { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .empty-state { text-align: center; padding: 32px 16px; color: var(--muted); }
+  .empty-state p { margin-bottom: 16px; }
+  .empty-state .big-icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
 </style>
 </head>
 <body>
@@ -41,28 +59,42 @@
   <div class="flex">
     <div>
       <h1>N1X Code</h1>
-      <div class="subtitle">Terminal AI Coding Agent &mdash; Configuration</div>
+      <div class="subtitle">Terminal AI Coding Agent — Configuration</div>
     </div>
-    <button class="btn btn-primary" onclick="saveConfig()">Save &amp; Close</button>
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="loadConfig()">Reset</button>
+      <button class="btn btn-primary" onclick="saveConfig()">Save</button>
+    </div>
   </div>
 
   <div id="status" class="status"></div>
 
   <div class="section" id="providers-section">
     <h2>AI Providers</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:16px">
+      Add your API keys below. You need at least one provider to use N1X Code.
+    </p>
     <div id="providers"></div>
-    <button class="add-btn" onclick="addProvider()">+ Add Provider</button>
+    <div class="add-section">
+      <select id="addProviderSelect">
+        <option value="">— Select a provider —</option>
+        <option value="anthropic">Anthropic Claude</option>
+        <option value="openai">OpenAI</option>
+        <option value="gemini">Google Gemini</option>
+        <option value="openrouter">OpenRouter</option>
+        <option value="groq">Groq</option>
+        <option value="azure">Azure OpenAI</option>
+        <option value="bedrock">AWS Bedrock</option>
+      </select>
+      <button class="btn btn-secondary" onclick="addProvider()">+ Add</button>
+    </div>
   </div>
 
   <div class="section">
-    <h2>Default Settings</h2>
+    <h2>Settings</h2>
     <div class="field">
-      <label>Build Agent Model</label>
+      <label>Default Model</label>
       <select id="buildModel"></select>
-    </div>
-    <div class="field">
-      <label>Plan Agent Model</label>
-      <select id="planModel"></select>
     </div>
     <div class="field">
       <label>Theme</label>
@@ -78,29 +110,34 @@
 
   <div class="section">
     <h2>Permissions</h2>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:12px">
+      Control which tools the AI can use and whether it should ask for permission.
+    </p>
     <div id="permissions"></div>
   </div>
 </div>
 
 <script>
 const providersData = [
-  { id: 'anthropic', name: 'Anthropic Claude', models: ['claude-sonnet-4-20250514', 'claude-3.5-haiku-20241022'] },
-  { id: 'openai', name: 'OpenAI', models: ['gpt-4o', 'gpt-4o-mini'] },
-  { id: 'gemini', name: 'Google Gemini', models: ['gemini-2.5-pro-exp-03-25', 'gemini-2.0-flash'] },
-  { id: 'openrouter', name: 'OpenRouter', models: ['openai/gpt-4o', 'anthropic/claude-sonnet-4'] },
-  { id: 'groq', name: 'Groq', models: ['llama-3.3-70b-versatile', 'mixtral-8x7b-32768'] },
-  { id: 'azure', name: 'Azure OpenAI', models: ['gpt-4o'] },
-  { id: 'bedrock', name: 'AWS Bedrock', models: ['claude-sonnet-4-20250514'] },
+  { id: 'anthropic', name: 'Anthropic Claude', keyUrl: 'https://console.anthropic.com/settings/keys', models: ['claude-sonnet-4-20250514', 'claude-3.5-haiku-20241022'] },
+  { id: 'openai', name: 'OpenAI', keyUrl: 'https://platform.openai.com/api-keys', models: ['gpt-4o', 'gpt-4o-mini'] },
+  { id: 'gemini', name: 'Google Gemini', keyUrl: 'https://aistudio.google.com/app/apikey', models: ['gemini-2.5-pro-exp-03-25', 'gemini-2.0-flash'] },
+  { id: 'openrouter', name: 'OpenRouter', keyUrl: 'https://openrouter.ai/keys', models: ['openai/gpt-4o', 'anthropic/claude-sonnet-4'] },
+  { id: 'groq', name: 'Groq', keyUrl: 'https://console.groq.com/keys', models: ['llama-3.3-70b-versatile', 'mixtral-8x7b-32768'] },
+  { id: 'azure', name: 'Azure OpenAI', keyUrl: 'https://portal.azure.com/', models: ['gpt-4o'] },
+  { id: 'bedrock', name: 'AWS Bedrock', keyUrl: 'https://console.aws.amazon.com/bedrock/', models: ['claude-sonnet-4-20250514'] },
 ];
 
 let config = { providers: {}, permissions: { bash: 'ask', write: 'allow', edit: 'allow' } };
+let initialConfig = '';
 
 async function loadConfig() {
   try {
     const res = await fetch('/api/config');
     config = await res.json();
+    initialConfig = JSON.stringify(config);
     render();
-  } catch(e) { console.log('Using defaults'); }
+  } catch(e) { render(); }
 }
 
 function render() {
@@ -114,40 +151,74 @@ function render() {
 function renderProviders() {
   const container = document.getElementById('providers');
   container.innerHTML = '';
-  let count = 0;
-  for (const [id, p] of Object.entries(config.providers || {})) {
-    count++;
-    const div = document.createElement('div');
-    div.className = 'field';
-    const provName = getProviderName(id);
-    const modelOpts = getModelOptions(id, p.model || '');
-    div.innerHTML = '<div class="flex">' +
-      '<label>' + provName + ' <span class="badge">' + id + '</span></label>' +
-      '<button class="delete-btn" onclick="removeProvider(\'' + id + '\')">x</button>' +
-      '</div>' +
-      '<input type="password" placeholder="API Key" value="' + (p.apiKey || '') + '" data-provider="' + id + '" class="api-key">' +
-      '<div class="row" style="margin-top:8px">' +
-      '<select data-provider="' + id + '" class="model-select" style="flex:1">' + modelOpts + '</select>' +
-      '<button class="btn btn-secondary" onclick="testConnection(\'' + id + '\')">Test</button>' +
+  const entries = Object.entries(config.providers || {});
+  if (entries.length === 0) {
+    container.innerHTML = '<div class="empty-state">' +
+      '<span class="big-icon">🔑</span>' +
+      '<p>No providers configured yet.<br>Select one above and click <strong>+ Add</strong> to get started.</p>' +
       '</div>';
-    container.appendChild(div);
+    return;
   }
-  if (count === 0) {
-    container.innerHTML = '<p style="color:#666;padding:8px 0">No providers configured yet. Click "+ Add Provider" to add one.</p>';
+  for (const [id, p] of entries) {
+    const prov = providersData.find(x => x.id === id);
+    const provName = prov ? prov.name : id;
+    const modelOpts = getModelOptions(id, p.model || '');
+    const hasKey = p.apiKey && p.apiKey.length > 0;
+    const card = document.createElement('div');
+    card.className = 'provider-card' + (hasKey ? ' connected' : '');
+    card.innerHTML =
+      '<div class="provider-header">' +
+        '<div>' +
+          '<div class="provider-name">' + provName + ' <small>' + id + '</small></div>' +
+          '<div class="provider-status">' +
+            '<span class="dot ' + (hasKey ? 'active' : 'inactive') + '"></span>' +
+            (hasKey ? 'API key set' : 'No API key') +
+          '</div>' +
+        '</div>' +
+        '<div>' +
+          (prov && prov.keyUrl ? '<a class="help-link" href="' + prov.keyUrl + '" target="_blank">Get API key ↗</a>' : '') +
+          ' <button class="btn btn-danger" style="padding:4px 10px;font-size:0.8rem" onclick="removeProvider(\'' + id + '\')">Remove</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="field" style="margin-bottom:8px">' +
+        '<label>API Key</label>' +
+        '<input type="password" placeholder="sk-ant-..." value="' + (p.apiKey || '') + '" data-provider="' + id + '" class="api-key">' +
+      '</div>' +
+      '<div class="row">' +
+        '<div style="flex:1">' +
+          '<label>Model</label>' +
+          '<select data-provider="' + id + '" class="model-select">' + modelOpts + '</select>' +
+        '</div>' +
+        '<div>' +
+          '<label>&nbsp;</label>' +
+          '<button class="btn btn-secondary" style="white-space:nowrap" onclick="testConnection(\'' + id + '\')">Test Key</button>' +
+        '</div>' +
+      '</div>';
+    container.appendChild(card);
   }
+  document.getElementById('addProviderSelect').value = '';
 }
 
 function renderPermissions() {
   const container = document.getElementById('permissions');
   container.innerHTML = '';
   const perms = config.permissions || {};
-  const tools = ['bash', 'write', 'edit', 'read', 'grep', 'glob', 'webfetch', 'todowrite'];
+  const tools = [
+    { id: 'bash', desc: 'Run shell commands' },
+    { id: 'write', desc: 'Create new files' },
+    { id: 'edit', desc: 'Edit existing files' },
+    { id: 'read', desc: 'Read file contents' },
+    { id: 'grep', desc: 'Search file contents' },
+    { id: 'glob', desc: 'Search filenames' },
+    { id: 'webfetch', desc: 'Fetch web URLs' },
+    { id: 'todowrite', desc: 'Manage task list' },
+  ];
   tools.forEach(function(t) {
     const div = document.createElement('div');
     div.className = 'perm-row';
-    const val = perms[t] || 'allow';
-    div.innerHTML = '<span>' + t + '</span>' +
-      '<select data-perm="' + t + '">' +
+    const val = perms[t.id] || 'allow';
+    div.innerHTML = '<span>' + t.id + ' <small style="color:#666;font-size:0.8rem">' + t.desc + '</small></span>' +
+      '<select data-perm="' + t.id + '">' +
       '<option value="allow"' + (val === 'allow' ? ' selected' : '') + '>Allow</option>' +
       '<option value="ask"' + (val === 'ask' ? ' selected' : '') + '>Ask</option>' +
       '<option value="deny"' + (val === 'deny' ? ' selected' : '') + '>Deny</option>' +
@@ -157,14 +228,10 @@ function renderPermissions() {
 }
 
 function renderModels() {
-  const buildSel = document.getElementById('buildModel');
-  const planSel = document.getElementById('planModel');
+  const sel = document.getElementById('buildModel');
   const allModels = getFlatModels();
-  buildSel.innerHTML = allModels.map(function(m) {
+  sel.innerHTML = allModels.map(function(m) {
     return '<option value="' + m + '"' + (config.buildModel === m ? ' selected' : '') + '>' + m + '</option>';
-  }).join('');
-  planSel.innerHTML = allModels.map(function(m) {
-    return '<option value="' + m + '"' + (config.planModel === m ? ' selected' : '') + '>' + m + '</option>';
   }).join('');
 }
 
@@ -178,36 +245,35 @@ function getFlatModels() {
   return result;
 }
 
-function getProviderName(id) {
-  const p = providersData.find(function(x) { return x.id === id; });
-  return p ? p.name : id;
-}
-
 function getModelOptions(providerId, selected) {
   const p = providersData.find(function(x) { return x.id === providerId; });
-  if (!p) { return '<option>Default</option>'; }
+  if (!p) { return '<option value="">Default</option>'; }
   return p.models.map(function(m) {
     return '<option value="' + m + '"' + (m === selected ? ' selected' : '') + '>' + m + '</option>';
   }).join('');
 }
 
 function addProvider() {
-  const id = prompt('Enter provider ID (anthropic, openai, gemini, openrouter, groq, azure, bedrock):');
-  if (!id || config.providers[id]) return;
+  const sel = document.getElementById('addProviderSelect');
+  const id = sel.value;
+  if (!id) { showStatus('Select a provider from the dropdown first.', false); return; }
+  if (config.providers && config.providers[id]) { showStatus('Provider "' + id + '" is already added.', false); return; }
+  if (!config.providers) config.providers = {};
   config.providers[id] = { apiKey: '', model: '' };
   renderProviders();
+  showStatus('Added ' + id + '. Enter your API key and click Save.', true);
 }
 
 function removeProvider(id) {
   delete config.providers[id];
   renderProviders();
+  showStatus('Removed ' + id + '.', true);
 }
 
 async function saveConfig() {
   config.theme = document.getElementById('theme').value;
   config.autoCompact = document.getElementById('autoCompact').checked;
   config.buildModel = document.getElementById('buildModel').value;
-  config.planModel = document.getElementById('planModel').value;
 
   config.permissions = {};
   document.querySelectorAll('[data-perm]').forEach(function(el) {
@@ -224,6 +290,10 @@ async function saveConfig() {
     if (config.providers[provider]) config.providers[provider].model = el.value;
   });
 
+  const btn = document.querySelector('.btn-primary');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
   try {
     const res = await fetch('/api/config/save', {
       method: 'POST',
@@ -231,16 +301,22 @@ async function saveConfig() {
       body: JSON.stringify(config)
     });
     const data = await res.json();
+    initialConfig = JSON.stringify(config);
     showStatus(data.status === 'ok' ? 'Configuration saved!' : 'Error saving', data.status === 'ok');
   } catch(e) {
     showStatus('Error: ' + e.message, false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save';
   }
 }
 
 async function testConnection(providerId) {
   const el = document.querySelector('.api-key[data-provider="' + providerId + '"]');
   const key = el ? el.value : '';
-  if (!key) { showStatus('Enter an API key first', false); return; }
+  if (!key) { showStatus('Enter an API key first.', false); return; }
+  const btn = document.querySelector('.provider-card .btn-secondary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Testing...'; }
   try {
     const res = await fetch('/api/test', {
       method: 'POST',
@@ -248,9 +324,15 @@ async function testConnection(providerId) {
       body: JSON.stringify({ provider: providerId, apiKey: key })
     });
     const data = await res.json();
-    showStatus(data.success ? 'Key saved. Run "nix run hello" to test.' : data.error, data.success);
+    if (data.success) {
+      showStatus('Key saved! Run n1x run "hello" to test the connection.', true);
+    } else {
+      showStatus(data.error || 'Connection failed', false);
+    }
   } catch(e) {
     showStatus('Error: ' + e.message, false);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Test Key'; }
   }
 }
 
@@ -260,6 +342,7 @@ function showStatus(msg, success) {
   el.className = 'status ' + (success ? 'success' : 'error');
   el.style.display = 'block';
   setTimeout(function() { el.style.display = 'none'; }, 5000);
+  if (!success) console.error(msg);
 }
 
 loadConfig();
