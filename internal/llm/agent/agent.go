@@ -295,6 +295,12 @@ func (a *Agent) streamLoop(ctx context.Context, messages []provider.Message, ses
 				currentTool.Input = toolCallBuf.String()
 				response.ToolCalls = append(response.ToolCalls, currentTool)
 
+			case provider.EventError:
+				if eventCh != nil {
+					eventCh <- event
+				}
+				return "", fmt.Errorf("LLM error: %s", event.Err)
+
 			case provider.EventComplete:
 				response.Role = "assistant"
 				messages = append(messages, response)

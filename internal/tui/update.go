@@ -140,9 +140,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, readNextEvent(m.eventCh)
 
 		case provider.EventError:
-			m.streamBuf.WriteString(fmt.Sprintf("Error: %s", e.Err))
+			m.streaming = false
 			m.AddMessage("tool", fmt.Sprintf("Error: %s", e.Err))
-			return m, readNextEvent(m.eventCh)
+			return m, nil
 		}
 
 	case streamDoneMsg:
