@@ -86,6 +86,13 @@ var SupportedModels = []Model{
 	{ID: "gpt-4o-mini", Provider: ProviderOpenAI, DisplayName: "GPT-4o Mini", ContextWindow: 128000, DefaultMaxTokens: 16384, CostPer1MIn: 0.15, CostPer1MOut: 0.60, SupportsImages: true},
 	{ID: "gemini-2.5-pro-exp-03-25", Provider: ProviderGemini, DisplayName: "Gemini 2.5 Pro", ContextWindow: 1048576, DefaultMaxTokens: 8192, CostPer1MIn: 1.25, CostPer1MOut: 10.00, CanReason: true, SupportsImages: true},
 	{ID: "gemini-2.0-flash", Provider: ProviderGemini, DisplayName: "Gemini 2.0 Flash", ContextWindow: 1048576, DefaultMaxTokens: 8192, CostPer1MIn: 0.10, CostPer1MOut: 0.40, SupportsImages: true},
+
+	{ID: "openai/gpt-4o", Provider: ProviderOpenRouter, DisplayName: "GPT-4o", ContextWindow: 128000, DefaultMaxTokens: 2048, CostPer1MIn: 2.50, CostPer1MOut: 10.00, SupportsImages: true},
+	{ID: "openai/gpt-4o-mini", Provider: ProviderOpenRouter, DisplayName: "GPT-4o Mini", ContextWindow: 128000, DefaultMaxTokens: 2048, CostPer1MIn: 0.15, CostPer1MOut: 0.60, SupportsImages: true},
+	{ID: "anthropic/claude-sonnet-4-20250514", Provider: ProviderOpenRouter, DisplayName: "Claude Sonnet 4", ContextWindow: 200000, DefaultMaxTokens: 2048, CostPer1MIn: 3.00, CostPer1MOut: 15.00, CanReason: true, SupportsImages: true},
+	{ID: "google/gemini-2.0-flash-001", Provider: ProviderOpenRouter, DisplayName: "Gemini 2.0 Flash", ContextWindow: 1048576, DefaultMaxTokens: 2048, CostPer1MIn: 0.10, CostPer1MOut: 0.40, SupportsImages: true},
+	{ID: "deepseek/deepseek-chat", Provider: ProviderOpenRouter, DisplayName: "DeepSeek Chat", ContextWindow: 128000, DefaultMaxTokens: 2048, CostPer1MIn: 0.27, CostPer1MOut: 1.10},
+	{ID: "mistralai/mistral-large", Provider: ProviderOpenRouter, DisplayName: "Mistral Large", ContextWindow: 128000, DefaultMaxTokens: 2048, CostPer1MIn: 2.00, CostPer1MOut: 6.00},
 	{ID: "nvidia/nemotron-ultra", Provider: ProviderNvidiaNIM, DisplayName: "Nemotron Ultra", ContextWindow: 128000, DefaultMaxTokens: 8192, CostPer1MIn: 0.00, CostPer1MOut: 0.00},
 	{ID: "nvidia/llama-3.1-nemotron-70b-instruct", Provider: ProviderNvidiaNIM, DisplayName: "Nemotron 70B", ContextWindow: 128000, DefaultMaxTokens: 4096, CostPer1MIn: 0.00, CostPer1MOut: 0.00},
 	{ID: "deepseek-ai/deepseek-v4-pro", Provider: ProviderNvidiaNIM, DisplayName: "DeepSeek V4 Pro", ContextWindow: 128000, DefaultMaxTokens: 8192, CostPer1MIn: 0.00, CostPer1MOut: 0.00},
