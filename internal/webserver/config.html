@@ -310,8 +310,13 @@ async function saveConfig() {
       return;
     }
     const data = await res.json();
-    initialConfig = JSON.stringify(config);
-    showStatus(data.status === 'ok' ? 'Configuration saved!' : 'Error saving', data.status === 'ok');
+    if (data.status === 'ok') {
+      // Reload fresh config from server so omitempty is reflected
+      await loadConfig();
+      showStatus('Configuration saved!', true);
+    } else {
+      showStatus('Error saving', false);
+    }
   } catch(e) {
     showStatus('Error: ' + e.message, false);
   } finally {
